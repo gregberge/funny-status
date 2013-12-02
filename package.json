@@ -1,6 +1,6 @@
 {
   "name": "funny-status",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Check NPM and GitHub status with sound.",
   "main": "index.js",
   "scripts": {
