@@ -32,7 +32,7 @@ describe('Status', function () {
       expect(npm.up).to.be.called;
     });
 
-    it('should play sound once if status is up, then down', function () {
+    it('should play sound once if status is down 5 times', function () {
       sinon.stub(github, 'up').yields(true);
       sinon.stub(npm, 'up').yields(true);
 
@@ -40,6 +40,12 @@ describe('Status', function () {
 
       github.up.restore();
       sinon.stub(github, 'up').yields(false);
+
+      status.ping();
+      status.ping();
+      status.ping();
+      status.ping();
+      status.ping();
 
       status.ping();
 
@@ -47,7 +53,7 @@ describe('Status', function () {
       expect(play).to.be.calledWithMatch(sinon.match(/mario-die.mp3/));
     });
 
-    it('should play sound once if status is down, then up', function () {
+    it('should play sound once if status is up 5 times', function () {
       sinon.stub(github, 'up').yields(false);
       sinon.stub(npm, 'up').yields(true);
 
@@ -55,6 +61,12 @@ describe('Status', function () {
 
       github.up.restore();
       sinon.stub(github, 'up').yields(true);
+
+      status.ping();
+      status.ping();
+      status.ping();
+      status.ping();
+      status.ping();
 
       status.ping();
 
