@@ -7,19 +7,23 @@ describe('Npm', function () {
     var endpoint = 'http://registry.npmjs.org';
 
     it('should ping service', function (done) {
-      nock(endpoint).get('/').reply(200, { db_name: 'registry' });
-      npm.up(function (err) {
-        if (err) return done(err);
-        expect(npm.status).to.equal('up');
+      nock(endpoint)
+        .get('/')
+        .reply(200, { db_name: 'registry' });
+
+      npm.up(function (up) {
+        expect(up).to.be.true;
         done();
       });
     });
 
     it('should return an error if status is not 200', function (done) {
-      nock(endpoint).get('/').reply(500);
-      npm.up(function (err) {
-        if (err) return done(err);
-        expect(npm.status).to.equal('down');
+      nock(endpoint)
+        .get('/')
+        .reply(500);
+
+      npm.up(function (up) {
+        expect(up).to.be.false;
         done();
       });
     });

@@ -14,8 +14,6 @@ describe('Status', function () {
     beforeEach(function () {
       play = sinon.stub();
       status.__set__('play', play);
-      sinon.stub(github, 'up').yields();
-      sinon.stub(npm, 'up').yields();
     });
 
     afterEach(function () {
@@ -25,6 +23,9 @@ describe('Status', function () {
     });
 
     it('should ping each services', function () {
+      sinon.stub(github, 'up').yields();
+      sinon.stub(npm, 'up').yields();
+
       status.ping();
 
       expect(github.up).to.be.called;
@@ -32,10 +33,14 @@ describe('Status', function () {
     });
 
     it('should play sound once if status is up, then down', function () {
-      github.status = 'up';
+      sinon.stub(github, 'up').yields(true);
+      sinon.stub(npm, 'up').yields(true);
+
       status.ping();
 
-      github.status = 'down';
+      github.up.restore();
+      sinon.stub(github, 'up').yields(false);
+
       status.ping();
 
       expect(play).to.be.calledOnce;
@@ -43,10 +48,14 @@ describe('Status', function () {
     });
 
     it('should play sound once if status is down, then up', function () {
-      github.status = 'down';
+      sinon.stub(github, 'up').yields(false);
+      sinon.stub(npm, 'up').yields(true);
+
       status.ping();
 
-      github.status = 'up';
+      github.up.restore();
+      sinon.stub(github, 'up').yields(true);
+
       status.ping();
 
       expect(play).to.be.calledOnce;
