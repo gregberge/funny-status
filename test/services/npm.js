@@ -2,28 +2,34 @@ var expect = require('chai').expect;
 var nock = require('nock');
 var npm = require('../../lib/services/npm');
 
-describe('Npm', function () {
-  describe('#up', function () {
-    var endpoint = 'http://registry.npmjs.org';
+describe('NPM', function () {
+  var endpoint = 'http://registry.npmjs.org';
 
-    it('should ping service', function (done) {
+  describe('with a 200', function () {
+    beforeEach(function () {
       nock(endpoint)
         .get('/')
-        .reply(200, { db_name: 'registry' });
+        .reply(200);
+    });
 
-      npm.up(function (up) {
-        expect(up).to.be.true;
+    it('should be good', function (done) {
+      npm()(function (err) {
+        expect(err).to.not.exist;
         done();
       });
     });
+  });
 
-    it('should return an error if status is not 200', function (done) {
+  describe('with a 500', function () {
+    beforeEach(function () {
       nock(endpoint)
         .get('/')
         .reply(500);
+    });
 
-      npm.up(function (up) {
-        expect(up).to.be.false;
+    it('should return an error', function (done) {
+      npm()(function (err) {
+        expect(err.message).to.equal('Bad statusCode: 500');
         done();
       });
     });

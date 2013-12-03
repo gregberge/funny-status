@@ -1,77 +1,24 @@
 var expect = require('chai').expect;
-var sinon = require('sinon');
-var rewire = require('rewire');
-var status = rewire('../lib/status');
-var github = require('../lib/services/github');
-var npm = require('../lib/services/npm');
-
-require('chai').use(require('sinon-chai'));
+var st = require('../lib/status');
 
 describe('Status', function () {
-  describe('#ping', function () {
-    var play;
-
-    beforeEach(function () {
-      play = sinon.stub();
-      status.__set__('play', play);
+  describe('#getChange', function () {
+    it('should return up if only the last entry is down', function () {
+      var history = ['up', 'up', 'up', 'up', 'up', 'down'];
+      var change = st.getChange(history);
+      expect(change).to.equal('up');
     });
 
-    afterEach(function () {
-      github.up.restore();
-      npm.up.restore();
-      status.stop();
+    it('should return down if only the last entry is up', function () {
+      var history = ['down', 'down', 'down', 'down', 'down', 'up'];
+      var change = st.getChange(history);
+      expect(change).to.equal('down');
     });
 
-    it('should ping each services', function () {
-      sinon.stub(github, 'up').yields();
-      sinon.stub(npm, 'up').yields();
-
-      status.ping();
-
-      expect(github.up).to.be.called;
-      expect(npm.up).to.be.called;
-    });
-
-    it('should play sound once if status is down 5 times', function () {
-      sinon.stub(github, 'up').yields(true);
-      sinon.stub(npm, 'up').yields(true);
-
-      status.ping();
-
-      github.up.restore();
-      sinon.stub(github, 'up').yields(false);
-
-      status.ping();
-      status.ping();
-      status.ping();
-      status.ping();
-      status.ping();
-
-      status.ping();
-
-      expect(play).to.be.calledOnce;
-      expect(play).to.be.calledWithMatch(sinon.match(/mario-die.mp3/));
-    });
-
-    it('should play sound once if status is up 5 times', function () {
-      sinon.stub(github, 'up').yields(false);
-      sinon.stub(npm, 'up').yields(true);
-
-      status.ping();
-
-      github.up.restore();
-      sinon.stub(github, 'up').yields(true);
-
-      status.ping();
-      status.ping();
-      status.ping();
-      status.ping();
-      status.ping();
-
-      status.ping();
-
-      expect(play).to.be.calledOnce;
-      expect(play).to.be.calledWithMatch(sinon.match(/mario-stage-cleared.mp3/));
+    it('should return false else', function () {
+      var history = ['down', 'down', 'down', 'down', 'up', 'up'];
+      var change = st.getChange(history);
+      expect(change).to.be.false;
     });
   });
 });
