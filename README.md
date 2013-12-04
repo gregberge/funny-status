@@ -12,7 +12,7 @@ npm install -g funny-status
 
 ### CLI
 
-```sh
+```
 Usage: funny-status [options]
 
   Options:
@@ -69,6 +69,12 @@ var status = new FunnyStatus({
   service: myWebsite
 });
 status.start();
+```
+
+## Debug mode
+
+```sh
+DEBUG=true funny-status
 ```
 
 ## License
