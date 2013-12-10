@@ -13,7 +13,7 @@ npm install -g funny-status
 ### CLI
 
 ```
-Usage: funny-status [options]
+  Usage: funny-status [options]
 
   Options:
 
@@ -21,9 +21,11 @@ Usage: funny-status [options]
     -V, --version               output the version number
     -t, --time [n]              Ping wait time
     -T, --timeout [n]           Services timeout
+    -x, --threshold [n]         Number of consecutive success / failure required to play sound
     -s, --service [list]        Custom services (ex: "github,npm")
     -S, --success-sound [file]  Sound played when service up
     -F, --failure-sound [file]  Sound played when service down
+
 ```
 
 ### Node
@@ -40,6 +42,8 @@ The options accepted are :
 
 - `time`
     - Time between each ping.
+- `threshold`
+    - Number of consecutive success / failure required to play sound.
 - `service`
     - Services to ping.
 - `successSound`

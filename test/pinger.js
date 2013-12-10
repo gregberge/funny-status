@@ -29,6 +29,7 @@ describe('Pinger', function () {
       pinger.add('github', github);
       pinger.add('npm', npm);
       sinon.stub(pinger, 'purge');
+      sinon.stub(pinger, 'updateStatus');
     });
 
     it('should ping each services', function (done) {
@@ -38,7 +39,77 @@ describe('Pinger', function () {
         expect(pinger.history.github).to.deep.equal([ 'up' ]);
         expect(pinger.history.npm).to.deep.equal([ 'down' ]);
         expect(pinger.purge).to.be.called;
+        expect(pinger.updateStatus).to.be.calledWith('github');
+        expect(pinger.updateStatus).to.be.calledWith('npm');
         done();
+      });
+    });
+  });
+
+  describe('#updateStatus', function () {
+
+    describe('without enough history', function () {
+      beforeEach(function () {
+        pinger.options.threshold = 10;
+        pinger.history = {};
+        pinger.history.github = ['up', 'up', 'up'];
+      });
+
+      it('should return false', function () {
+        expect(pinger.updateStatus('github')).to.be.false;
+      });
+    });
+
+    describe('with different status', function () {
+      beforeEach(function () {
+        pinger.options.threshold = 3;
+        pinger.history = {};
+        pinger.history.github = ['up', 'up', 'up'];
+        pinger.statuses.github = 'up';
+      });
+
+      it('should return false', function () {
+        expect(pinger.updateStatus('github')).to.be.false;
+      });
+    });
+
+    describe('with no consecutive statuses', function () {
+      beforeEach(function () {
+        pinger.options.threshold = 3;
+        pinger.history = {};
+        pinger.history.github = ['up', 'down', 'up'];
+        pinger.statuses.github = 'down';
+      });
+
+      it('should return false', function () {
+        expect(pinger.updateStatus('github')).to.be.false;
+      });
+    });
+
+    describe('with actual status undefined', function () {
+      beforeEach(function () {
+        pinger.options.threshold = 3;
+        pinger.history = {};
+        pinger.history.github = ['up', 'up', 'up'];
+      });
+
+      it('should update status but return false', function () {
+        expect(pinger.updateStatus('github')).to.be.false;
+        expect(pinger.statuses.github).to.equal('up');
+      });
+    });
+
+    describe('if all is fine', function () {
+      beforeEach(function () {
+        pinger.options.threshold = 3;
+        pinger.history = {};
+        pinger.history.github = ['up', 'up', 'up'];
+        pinger.statuses.github = 'down';
+      });
+
+      it('should update current status and return it', function () {
+        expect(pinger.updateStatus('github')).to.equal('up');
+        expect(pinger.statuses.github).to.equal('up');
       });
     });
   });

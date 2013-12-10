@@ -43,16 +43,14 @@ describe('Daemon', function () {
 
   describe('#loop', function () {
     beforeEach(function () {
-      sinon.stub(daemon.pinger, 'ping').yields();
+      sinon.stub(daemon.pinger, 'ping').yields(null, ['up']);
       sinon.stub(daemon, 'handleStatusChange');
-      daemon.pinger.history.github = ['up'];
-      daemon.pinger.history.npm = ['up'];
     });
 
     it('should ping, handle change and setTimeout', function () {
       daemon.loop();
       expect(daemon.pinger.ping).to.be.called;
-      expect(daemon.handleStatusChange).to.be.calledWith(['up']);
+      expect(daemon.handleStatusChange).to.be.calledWith('up');
       expect(daemon.loopInterval).to.exists;
     });
   });
